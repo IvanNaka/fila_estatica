@@ -10,27 +10,25 @@ public class StaticQueue<T>{
     }
 
     public void add(T dado) throws Exception {
-        if (!isFull() && this.rpos <= this.data.length){
+        if (!isFull() && this.rpos <= this.data.length ){
             this.data[this.spos] = dado;
             this.spos += 1;
-        }else{
+            if (this.spos > this.data.length){
+                this.spos = getFirstSpace();
+            }
+        }
+        else{
             throw new Exception("Fila cheia!");
         }
     }
 
     public T remove (){
         var removedItem = this.data[rpos];
-        var newData = (T[]) new Object[this.data.length];
-        for (int i = 0; i <= this.data.length; i++ ){
-            if (rpos != i){
-                try{
-                    newData[i] = this.data[i];
-                }catch (IndexOutOfBoundsException e){
-                    continue;
-                }
-            }
+        this.data[rpos] = null;
+        if (rpos>=this.data.length){
+            this.rpos = Math.max(getFirstSpace(), 0);
+            return removedItem;
         }
-        this.data = newData;
         this.rpos += 1;
         return removedItem;
     }
@@ -42,14 +40,7 @@ public class StaticQueue<T>{
     }
 
     public boolean isFull(){
-        for (int i = 0; i <= this.data.length; i++ ){
-            try{
-                var item = this.data[i];
-            }catch (IndexOutOfBoundsException e){
-                return false;
-            }
-        }
-        return true;
+        return getFirstSpace() >= 0;
     }
     public boolean isEmpty(){
         for (int i = 0; i <= this.data.length; i++ ){
@@ -59,5 +50,16 @@ public class StaticQueue<T>{
             }catch (IndexOutOfBoundsException ignored){}
         }
         return true;
+    }
+
+    public int getFirstSpace(){
+        for (int i = 0; i <= this.data.length; i++ ){
+            try{
+                var item = this.data[i];
+            }catch (IndexOutOfBoundsException ignored){
+                return i;
+            }
+        }
+        return -1;
     }
 }
